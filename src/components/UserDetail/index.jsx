@@ -1,18 +1,17 @@
-import React from "react";
 import { Typography, Card, CardContent, Button } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-
 import "./styles.css";
 import models from "../../modelData/models";
 
 function UserDetail() {
+  //Lấy thông tin người dùng từ URL
   const { userId } = useParams();
   const user = models.userModel(userId);
 
   if (!user) {
     return <Typography variant="h6">User not found</Typography>;
   }
-
+  //END lấy thông tin người dùng từ URL
   return (
     <Card sx={{ maxWidth: 600, margin: "auto", marginTop: 4, padding: 2 }}>
       <CardContent>

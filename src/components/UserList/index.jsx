@@ -7,7 +7,6 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-
 import "./styles.css";
 import models from "../../modelData/models";
 

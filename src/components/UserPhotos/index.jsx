@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Typography, Card, CardContent, CardMedia } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
-
 import "./styles.css";
 import models from "../../modelData/models";
 
