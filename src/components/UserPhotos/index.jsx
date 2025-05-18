@@ -2,15 +2,17 @@ import { useState, useEffect } from "react";
 import { Typography, Card, CardContent, CardMedia } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import "./styles.css";
-import models from "../../modelData/models";
 
 function UserPhotos() {
   const { userId } = useParams();
   const [photos, setPhotos] = useState([]);
 
   useEffect(() => {
-    const userPhotos = models.photoOfUserModel(userId);
-    setPhotos(userPhotos);
+    // Gọi API để lấy ảnh của user
+    fetch(`http://localhost:8080/api/photo/photosOfUser/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setPhotos(data))
+      .catch(() => setPhotos([]));
   }, [userId]);
 
   return (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Divider,
@@ -8,10 +8,17 @@ import {
   Typography,
 } from "@mui/material";
 import "./styles.css";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData";
 
 function UserList() {
-  const users = models.userListModel();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchModel("http://localhost:8080/api/user/list")
+      .then(data => setUsers(data))
+      .catch(() => setUsers([]));
+  }, []);
+
   return (
     <div>
       <Typography variant="body1">

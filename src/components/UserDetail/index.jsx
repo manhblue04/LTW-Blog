@@ -1,12 +1,19 @@
 import { Typography, Card, CardContent, Button } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import "./styles.css";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData";
+import { useEffect, useState } from "react";
 
 function UserDetail() {
   //Lấy thông tin người dùng từ URL
   const { userId } = useParams();
-  const user = models.userModel(userId);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetchModel(`http://localhost:8080/api/user/${userId}`)
+      .then(data => setUser(data))
+      .catch(() => setUser(null));
+  }, [userId]);
 
   if (!user) {
     return <Typography variant="h6">User not found</Typography>;
