@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Typography, Card, CardContent, CardMedia } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import "./styles.css";
+import fetchModel from "../../lib/fetchModelData";
 
 function UserPhotos() {
   const { userId } = useParams();
@@ -9,8 +10,7 @@ function UserPhotos() {
 
   useEffect(() => {
     // Gọi API để lấy ảnh của user
-    fetch(`http://localhost:8080/api/photo/photosOfUser/${userId}`)
-      .then((res) => res.json())
+    fetchModel(`http://localhost:8080/api/photo/photosOfUser/${userId}`)
       .then((data) => setPhotos(data))
       .catch(() => setPhotos([]));
   }, [userId]);
