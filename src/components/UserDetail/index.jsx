@@ -11,7 +11,13 @@ function UserDetail() {
 
   useEffect(() => {
     fetchModel(`http://localhost:8080/api/user/${userId}`)
-      .then(data => setUser(data))
+      .then(data => {
+        if (!data) {
+          setUser(null);
+          return;
+        }
+        setUser(data);
+      })
       .catch(() => setUser(null));
   }, [userId]);
 

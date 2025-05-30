@@ -13,16 +13,38 @@ import fetchModel from "../../lib/fetchModelData";
 function UserList() {
   const [users, setUsers] = useState([]);
 
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    fetchModel("http://localhost:8080/api/user/count")
+      .then(data => {
+        if (!data) {
+          setCount(0);
+          return;
+        }
+        setCount(data.count);
+      })
+      .catch(() => setCount(0));
+  }, [count]);
+
+
   useEffect(() => {
     fetchModel("http://localhost:8080/api/user/list")
-      .then(data => setUsers(data))
+      .then(data => {
+        if (!data) {
+          setUsers([]);
+          return;
+        }
+        setUsers(data);
+      })
       .catch(() => setUsers([]));
   }, []);
 
   return (
     <div>
       <Typography variant="body1">
-        This is the user list, which takes up 3/12 of the window.
+        <strong>Total Users:</strong> {count}
+        {/* This is the user list, which takes up of the window. */}
       </Typography>
       <List component="nav">
         {users.map((item) => (
