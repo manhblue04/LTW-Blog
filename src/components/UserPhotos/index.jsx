@@ -11,7 +11,7 @@ import { Link, useParams } from "react-router-dom";
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
 
-function UserPhotos() {
+export default function UserPhotos({ reloadTrigger }) {
   const { userId } = useParams();
   const [photos, setPhotos] = useState([]);
   const [commentInputs, setCommentInputs] = useState({});
@@ -31,7 +31,14 @@ function UserPhotos() {
     // Lấy user hiện tại từ localStorage
     const u = localStorage.getItem("user");
     setCurrentUser(u ? JSON.parse(u) : null);
-  }, [userId]);
+  }, [userId, reloadTrigger]);
+
+  // Hàm reload lại danh sách ảnh (dùng khi upload thành công)
+  const reloadPhotos = () => {
+    fetchModel(`http://localhost:8080/api/photo/photosOfUser/${userId}`)
+      .then((data) => setPhotos(data || []))
+      .catch(() => setPhotos([]));
+  };
 
   // Xử lý nhập bình luận
   const handleInputChange = (photoId, value) => {
@@ -82,7 +89,7 @@ function UserPhotos() {
             <CardMedia
               component="img"
               height="300"
-              image={`/images/${photo.file_name}`}
+              image={`http://localhost:8080/images/${photo.file_name}`} 
               alt="User's Photo"
             />
             <CardContent>
@@ -145,5 +152,3 @@ function UserPhotos() {
     </div>
   );
 }
-
-export default UserPhotos;

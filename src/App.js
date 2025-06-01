@@ -25,6 +25,7 @@ const App = (props) => {
     const u = localStorage.getItem("user");
     return u ? JSON.parse(u) : null;
   });
+  const [reloadPhotoTrigger, setReloadPhotoTrigger] = useState(0);
 
   // Khi đăng nhập thành công, chuyển hướng về /users
   const handleLogin = (userObj) => {
@@ -39,13 +40,18 @@ const App = (props) => {
     setUser(null);
   };
 
+  // Khi upload ảnh thành công
+  const handleAddPhotoSuccess = () => {
+    setReloadPhotoTrigger((v) => v + 1);
+  };
+
   // Nếu chưa đăng nhập, chỉ hiển thị LoginRegister
   return (
     <Router>
       <div>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar user={user} onLogout={handleLogout} onAddPhotoSuccess={handleAddPhotoSuccess} />
           </Grid>
           <div className="main-topbar-buffer" />
           <Grid item sm={3}>
@@ -56,7 +62,6 @@ const App = (props) => {
           <Grid item sm={9}>
             <Paper className="main-grid-item">
               <Routes>
-                
                 <Route path="/login" element={<LoginRegister onLogin={handleLogin} />} />
 
                 <Route
@@ -72,7 +77,7 @@ const App = (props) => {
                   path="/photos/:userId"
                   element={
                     <RequireAuth>
-                      <UserPhotos />
+                      <UserPhotos reloadTrigger={reloadPhotoTrigger} />
                     </RequireAuth>
                   }
                 />
