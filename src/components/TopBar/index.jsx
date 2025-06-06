@@ -1,13 +1,36 @@
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddPhotoDialog from "./AddPhotoDialog";
+import fetchModel from "../../lib/fetchModelData";
 import "./styles.css";
 
 function TopBar({ user, onLogout, onAddPhotoSuccess }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [openAdd, setOpenAdd] = useState(false);
+  const [otherUserName, setOtherUserName] = useState("");
+
+  useEffect(() => {
+    // Lấy tên người khác nếu không phải trang của mình
+    let userId = null;
+    if (location.pathname.startsWith("/users/")) {
+      userId = location.pathname.split("/").pop();
+    } else if (location.pathname.startsWith("/photos/")) {
+      userId = location.pathname.split("/").pop();
+    }
+    if (userId && (!user || user._id !== userId)) {
+      fetchModel(`http://localhost:8080/api/user/${userId}/name`).then((data) => {
+        if (data && data.first_name) {
+          setOtherUserName(`${data.first_name} ${data.last_name}`);
+        } else {
+          setOtherUserName("");
+        }
+      });
+    } else {
+      setOtherUserName("");
+    }
+  }, [location.pathname, user]);
 
   // Xử lý logout
   const handleLogout = () => {
@@ -18,10 +41,23 @@ function TopBar({ user, onLogout, onAddPhotoSuccess }) {
   };
 
   let context = "User List";
-  if (location.pathname.startsWith("/users/") && user) {
-    context = `${user.first_name} ${user.last_name}`;
-  } else if (location.pathname.startsWith("/photos/") && user) {
-    context = `Photos of ${user.first_name} ${user.last_name}`;
+  // Hiển thị tên đúng người đang xem ảnh
+  if (location.pathname.startsWith("/users/")) {
+    // Lấy userId từ URL
+    const userId = location.pathname.split("/").pop();
+    // Nếu là trang cá nhân của mình
+    if (user && user._id === userId) {
+      context = `${user.first_name} ${user.last_name}`;
+    } else {
+      context = otherUserName ? otherUserName : `User: ${userId}`;
+    }
+  } else if (location.pathname.startsWith("/photos/")) {
+    const userId = location.pathname.split("/").pop();
+    if (user && user._id === userId) {
+      context = `Photos of ${user.first_name} ${user.last_name}`;
+    } else {
+      context = otherUserName ? `Photos of ${otherUserName}` : `Photos of ${userId}`;
+    }
   }
 
   return (

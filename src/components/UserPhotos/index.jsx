@@ -6,6 +6,7 @@ import {
   CardMedia,
   TextField,
   Button,
+  IconButton
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import "./styles.css";
@@ -17,6 +18,9 @@ export default function UserPhotos({ reloadTrigger }) {
   const [commentInputs, setCommentInputs] = useState({});
   const [commentErrors, setCommentErrors] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   useEffect(() => {
     fetchModel(`http://localhost:8080/api/photo/photosOfUser/${userId}`)
@@ -54,7 +58,6 @@ export default function UserPhotos({ reloadTrigger }) {
       return;
     }
     try {
-      // Sử dụng fetchModel thay cho fetch trực tiếp
       const data = await fetchModel(`http://localhost:8080/api/photo/commentsOfPhoto/${photoId}`, {
         method: "POST",
         body: JSON.stringify({ comment }),
@@ -76,14 +79,73 @@ export default function UserPhotos({ reloadTrigger }) {
     }
   };
 
+
+
+  const handleEditClick = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditValue(comment.comment);
+  };
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditValue("");
+  };
+
+  
+  const handleSaveEdit = async (photoId, commentId) => {
+
+    console.log("photoId", photoId, "commentId", commentId);
+
+    const newComment = editValue.trim();
+    if (!newComment) return;
+
+    // console.log("photoId", photoId, "commentId", commentId);
+
+
+    try {
+      const data = await fetchModel(`http://localhost:8080/api/photo/commentsOfPhoto/${photoId}/${commentId}`, {
+        method: "PUT",
+        body: JSON.stringify({ comment: newComment }),
+      });
+
+      if (!data || data.error) return;
+
+      setPhotos((prevPhotos) =>
+        prevPhotos.map((p) =>
+          p._id === photoId
+            ? {
+                ...p,
+                comments: p.comments.map((c) =>
+                  c._id === commentId ? { ...c, comment: data.comment } : c
+                ),
+              }
+            : p
+        )
+      );
+      setEditingCommentId(null);
+      setEditValue("");
+    } catch (err) {}
+  };
+
   return (
     <div style={{ padding: 20 }}>
+
+
       <Typography variant="h4" gutterBottom>
         Photos
       </Typography>
-      {photos.length === 0 ? (
+
+
+      {photos.length === 0 
+      
+      ? 
+      
+      (
         <Typography variant="body1">No photos found for this user.</Typography>
-      ) : (
+      ) 
+      
+      : 
+      
+      (
         photos.map((photo) => (
           <Card key={photo._id} sx={{ maxWidth: 500, marginBottom: 4 }}>
             <CardMedia
@@ -93,18 +155,27 @@ export default function UserPhotos({ reloadTrigger }) {
               alt="User's Photo"
             />
             <CardContent>
+
+
               <Typography variant="body2" color="text.secondary">
                 <strong>Posted on:</strong>{" "}
                 {new Date(photo.date_time).toLocaleString()}
               </Typography>
 
-              {photo.comments && photo.comments.length > 0 ? (
+
+              {photo.comments && photo.comments.length > 0 
+
+              ? 
+              
+              (
                 <div>
                   <Typography variant="h6" sx={{ marginTop: 2 }}>
                     Comments
                   </Typography>
                   {photo.comments.map((comment) => (
                     <div key={comment._id} style={{ marginTop: 10 }}>
+
+
                       <Typography variant="body2" color="text.secondary">
                         <strong>
                           <Link to={`/users/${comment.user?._id}`}>
@@ -113,15 +184,49 @@ export default function UserPhotos({ reloadTrigger }) {
                         </strong>{" "}
                         on {new Date(comment.date_time).toLocaleString()}:
                       </Typography>
-                      <Typography variant="body1">{comment.comment}</Typography>
+
+                      
+                      {/* {editingCommentId === comment._id 
+                      
+                      ? 
+                      
+                      (
+                        <>
+                          <input
+                            value={editValue}
+                            onChange={e => setEditValue(e.target.value)}
+                          />
+                          <button onClick={() => handleSaveEdit(photo._id, comment._id)}>Lưu</button>
+                          <button onClick={handleCancelEdit}>Hủy</button>
+                        </>
+                      ) 
+                      
+                      :
+                      
+                      (
+                        <>
+                          <span>{comment.comment}</span>
+                          {currentUser && comment.user?._id === currentUser._id && (
+                            <button onClick={() => handleEditClick(comment)}>Sửa</button>
+                          )}
+                        </>
+                      )} */}
+
+
+                      <span>{comment.comment}</span>
                     </div>
                   ))}
                 </div>
-              ) : (
+              ) 
+              
+              : 
+              
+              (
                 <Typography variant="body2" sx={{ marginTop: 2 }}>
                   No comments yet.
                 </Typography>
               )}
+
 
               {/* Giao diện nhập bình luận mới */}
               {currentUser && (
@@ -145,6 +250,8 @@ export default function UserPhotos({ reloadTrigger }) {
                   </Button>
                 </div>
               )}
+
+
             </CardContent>
           </Card>
         ))
